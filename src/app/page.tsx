@@ -6,7 +6,7 @@ import { RefreshCw, ChevronLeft } from 'lucide-react';
 import InputSection from '@/components/InputSection';
 import PersonGrid from '@/components/PersonGrid';
 import ResultCard from '@/components/ResultCard';
-import { generateText } from '@/lib/api';
+import { generateText, getDefaultText } from '@/lib/api';
 
 // カテゴリデータの型
 interface CategoryData {
@@ -29,7 +29,7 @@ export default function Home() {
   const [isGridAnimating, setIsGridAnimating] = useState(false);
   const [visualization, setVisualization] = useState<VisualizationState | null>(null);
 
-  const handleVisualize = useCallback(async (title: string, categories: CategoryData[], villageSize: number, names: string[], customText?: string) => {
+  const handleVisualize = useCallback(async (title: string, categories: CategoryData[], villageSize: number, names: string[], customText?: string, useAI?: boolean) => {
     setIsLoading(true);
     setShowResults(true);
     setIsGridAnimating(true);
@@ -67,10 +67,19 @@ export default function Home() {
     // カテゴリ説明を作成
     const categoryDescription = categories.map(c => `${c.label}: ${c.percentage}%`).join('、');
 
-    // API呼び出し（カスタムテキストがあればスキップ）
+    // API呼び出し（カスタムテキストがあればスキップ、AIモードオフなら定型文）
     try {
-      // カスタムテキストがあればそれを使用、なければAI生成
-      const text = customText || await generateText(`${title}（${categoryDescription}）`, categories, villageSize);
+      let text: string;
+      if (customText) {
+        // カスタムテキストを使用
+        text = customText;
+      } else if (useAI) {
+        // AIモードがオンの場合はGemini APIを呼び出し
+        text = await generateText(`${title}（${categoryDescription}）`, categories, villageSize);
+      } else {
+        // デフォルト: 定型文を使用
+        text = getDefaultText(title, categories, villageSize);
+      }
 
       // テキスト生成完了を反映
       setVisualization({

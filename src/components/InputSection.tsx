@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Users, Percent, Hash, Plus, X, ChevronDown, ChevronRight } from 'lucide-react';
+import { Sparkles, Users, Percent, Hash, Plus, X, ChevronDown, ChevronRight, Bot } from 'lucide-react';
 
 type Mode = 'percentage' | 'population';
 
@@ -32,7 +32,7 @@ const CATEGORY_COLORS = [
 const VILLAGE_SIZE_OPTIONS = [10, 20, 50, 100, 200, 500, 1000];
 
 interface InputSectionProps {
-    onVisualize: (title: string, categories: { label: string; percentage: number; color: string }[], villageSize: number, names: string[], customText?: string) => void;
+    onVisualize: (title: string, categories: { label: string; percentage: number; color: string }[], villageSize: number, names: string[], customText?: string, useAI?: boolean) => void;
     isLoading: boolean;
 }
 
@@ -50,6 +50,8 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
     // カスタム詩機能
     const [useCustomText, setUseCustomText] = useState(false);
     const [customText, setCustomText] = useState('');
+    // AI文章生成モード
+    const [useAI, setUseAI] = useState(false);
 
     // カテゴリを追加
     const addCategory = () => {
@@ -112,7 +114,7 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
             .map(n => n.trim())
             .filter(n => n.length > 0);
 
-        onVisualize(title, processedCategories, villageSize, names, useCustomText ? customText : undefined);
+        onVisualize(title, processedCategories, villageSize, names, useCustomText ? customText : undefined, useAI);
     };
 
     const formatPopulation = (value: string) => {
@@ -217,6 +219,28 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
                                             placeholder="例: 佐藤, 鈴木, 田中...（改行区切りも可）&#13;&#10;※入力した人数分だけランダムに割り当てられます"
                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-24 resize-y"
                                         />
+
+                                        {/* AI文章生成モード */}
+                                        <div className="pt-2 border-t border-slate-100">
+                                            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={useAI}
+                                                    onChange={(e) => {
+                                                        setUseAI(e.target.checked);
+                                                        if (e.target.checked) {
+                                                            setUseCustomText(false);
+                                                        }
+                                                    }}
+                                                    className="w-4 h-4 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
+                                                />
+                                                <Bot className="w-4 h-4 text-[#4ECDC4]" />
+                                                Gemini AIで文章を生成する
+                                            </label>
+                                            <p className="text-xs text-slate-400 mt-1 ml-6">
+                                                ※オフの場合は定型文が表示されます
+                                            </p>
+                                        </div>
 
                                         {/* 隠し機能: オリジナル詩の入力 */}
                                         <div className="pt-2 border-t border-slate-100">

@@ -34,7 +34,7 @@ export async function generateText(title: string, categories: CategoryData[], vi
 
     // APIキーがない場合はデモテキストを返す
     if (!apiKey) {
-        return getDemoText(title, categories, villageSize);
+        return getDefaultText(title, categories, villageSize);
     }
 
     // APIキーがない場合はデモテキストを返す
@@ -78,12 +78,12 @@ ${allDetails}
     } catch (error) {
         console.error('Gemini SDK error:', error);
         // エラー時はデモテキストを返す
-        return getDemoText(title, categories, villageSize);
+        return getDefaultText(title, categories, villageSize);
     }
 }
 
-// デモ用テキスト
-function getDemoText(title: string, categories: CategoryData[], villageSize: number): string {
+// デモ用テキスト（定型文）
+export function getDefaultText(title: string, categories: CategoryData[], villageSize: number): string {
     const categoryDetails = categories.map(cat => {
         const count = Math.round((cat.percentage / 100) * villageSize);
         return `${count}人は${cat.label}を`;
