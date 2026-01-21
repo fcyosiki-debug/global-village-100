@@ -44,8 +44,6 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
     const [categories, setCategories] = useState<CategoryData[]>([
         { id: '1', label: '', value: '', color: CATEGORY_COLORS[0] }
     ]);
-    // 名前入力アコーディオンの開閉状態
-    const [isNameSectionOpen, setIsNameSectionOpen] = useState(false);
     // 入力された名前リスト
     const [nameListText, setNameListText] = useState('');
     // カスタム詩機能
@@ -246,90 +244,71 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
                         <span className="text-sm text-slate-500">人</span>
                     </div>
 
-                    {/* 名前割り当てオプション（アコーディオン） */}
-                    <div className="mt-4">
-                        <button
-                            onClick={() => setIsNameSectionOpen(!isNameSectionOpen)}
-                            className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#4ECDC4] transition-colors w-full text-left"
-                        >
-                            {isNameSectionOpen ? (
-                                <ChevronDown className="w-4 h-4" />
-                            ) : (
-                                <ChevronRight className="w-4 h-4" />
-                            )}
-                            詳細設定：特定の名前を割り当てる
-                        </button>
-                        <AnimatePresence>
-                            {isNameSectionOpen && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="pt-2 space-y-4">
-                                        <textarea
-                                            value={nameListText}
-                                            onChange={(e) => setNameListText(e.target.value)}
-                                            placeholder="例: 佐藤, 鈴木, 田中...（改行区切りも可）&#13;&#10;※入力した人数分だけランダムに割り当てられます"
-                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-24 resize-y"
-                                        />
+                    {/* 名前割り当てオプション（常時表示） */}
+                    <div className="mt-6 pt-6 border-t border-slate-100">
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                            特定の名前を割り当てる
+                        </label>
+                        <div className="space-y-4">
+                            <textarea
+                                value={nameListText}
+                                onChange={(e) => setNameListText(e.target.value)}
+                                placeholder="例: 佐藤, 鈴木, 田中...（改行区切りも可）&#13;&#10;※入力した人数分だけランダムに割り当てられます"
+                                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-24 resize-y"
+                            />
 
-                                        {/* AI文章生成モード */}
-                                        <div className="pt-2 border-t border-slate-100">
-                                            <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={useAI}
-                                                    onChange={(e) => {
-                                                        setUseAI(e.target.checked);
-                                                        if (e.target.checked) {
-                                                            setUseCustomText(false);
-                                                        }
-                                                    }}
-                                                    className="w-4 h-4 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
-                                                />
-                                                <Bot className="w-4 h-4 text-[#4ECDC4]" />
-                                                Gemini AIで文章を生成する
-                                            </label>
-                                            <p className="text-xs text-slate-400 mt-1 ml-6">
-                                                ※オフの場合は定型文が表示されます
-                                            </p>
-                                        </div>
+                            {/* AI文章生成モード */}
+                            <div className="pt-2 border-t border-slate-100">
+                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={useAI}
+                                        onChange={(e) => {
+                                            setUseAI(e.target.checked);
+                                            if (e.target.checked) {
+                                                setUseCustomText(false);
+                                            }
+                                        }}
+                                        className="w-4 h-4 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
+                                    />
+                                    <Bot className="w-4 h-4 text-[#4ECDC4]" />
+                                    Gemini AIで文章を生成する
+                                </label>
+                                <p className="text-xs text-slate-400 mt-1 ml-6">
+                                    ※オフの場合は定型文が表示されます
+                                </p>
+                            </div>
 
-                                        {/* 隠し機能: オリジナル詩の入力 */}
-                                        <div className="pt-2 border-t border-slate-100">
-                                            <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={useCustomText}
-                                                    onChange={(e) => setUseCustomText(e.target.checked)}
-                                                    className="w-3.5 h-3.5 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
-                                                />
-                                                オリジナルの解説文を使用
-                                            </label>
-                                            <AnimatePresence>
-                                                {useCustomText && (
-                                                    <motion.div
-                                                        initial={{ height: 0, opacity: 0 }}
-                                                        animate={{ height: 'auto', opacity: 1 }}
-                                                        exit={{ height: 0, opacity: 0 }}
-                                                        className="overflow-hidden"
-                                                    >
-                                                        <textarea
-                                                            value={customText}
-                                                            onChange={(e) => setCustomText(e.target.value)}
-                                                            placeholder="あなた自身の言葉で解説文を書いてください..."
-                                                            className="w-full mt-2 px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-32 resize-y"
-                                                        />
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                            {/* 隠し機能: オリジナル詩の入力 */}
+                            <div className="pt-2 border-t border-slate-100">
+                                <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+                                    <input
+                                        type="checkbox"
+                                        checked={useCustomText}
+                                        onChange={(e) => setUseCustomText(e.target.checked)}
+                                        className="w-3.5 h-3.5 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
+                                    />
+                                    オリジナルの解説文を使用
+                                </label>
+                                <AnimatePresence>
+                                    {useCustomText && (
+                                        <motion.div
+                                            initial={{ height: 0, opacity: 0 }}
+                                            animate={{ height: 'auto', opacity: 1 }}
+                                            exit={{ height: 0, opacity: 0 }}
+                                            className="overflow-hidden"
+                                        >
+                                            <textarea
+                                                value={customText}
+                                                onChange={(e) => setCustomText(e.target.value)}
+                                                placeholder="あなた自身の言葉で解説文を書いてください..."
+                                                className="w-full mt-2 px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-32 resize-y"
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
