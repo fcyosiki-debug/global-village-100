@@ -32,9 +32,9 @@ export async function generateText(title: string, categories: CategoryData[], vi
         ? `${categoryDetails}、その他の人は${otherCount}人`
         : categoryDetails;
 
-    // APIキーがない場合はデモテキストを返す
+    // APIキーがない場合はエラーメッセージを返す
     if (!apiKey) {
-        return getDefaultText(title, categories, villageSize);
+        return '【エラー】Gemini APIキーが設定されていません。\nVercelのダッシュボードで環境変数（NEXT_PUBLIC_GEMINI_API_KEY）を設定してください。';
     }
 
     // APIキーがない場合はデモテキストを返す
