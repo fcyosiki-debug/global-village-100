@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Users, Percent, Hash, Plus, X, ChevronDown, ChevronRight, Bot } from 'lucide-react';
+import { Sparkles, Users, Percent, Hash, Plus, X, ChevronDown, ChevronRight, Bot, BookOpen } from 'lucide-react';
+import { SAMPLES } from '@/lib/samples';
 
 type Mode = 'percentage' | 'population';
 
@@ -88,6 +89,36 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
         }, 0);
     };
 
+
+    // サンプル選択ハンドラ
+    const handleSampleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const sampleId = e.target.value;
+        if (!sampleId) return;
+
+        const sample = SAMPLES.find(s => s.id === sampleId);
+        if (sample) {
+            setTitle(sample.title);
+            setCategories(sample.categories.map((c, i) => ({
+                id: Date.now().toString() + i,
+                label: c.label,
+                value: c.value,
+                color: c.color
+            })));
+            setVillageSize(100);
+            setMode('percentage'); // サンプル値は基本的に人数(%)なので
+            setUseCustomText(true);
+            setCustomText(sample.customText);
+            setUseAI(false);
+
+            // 選択後、セレクトボックスをリセットするために空にする必要はないが、
+            // ユーザーが「選んだ」感を持たせるためにそのままでも良い。
+            // ただし、同じものを再度選びたい場合を考慮すると、stateで管理する必要があるかも。
+            // 今回はシンプルにvalue={''}にして毎回選択させるスタイルにするか、
+            // あるいは「現在選択中のサンプル」を表示するか。
+            // シンプルに値変更時のみ発火するselectにして、valueは管理しない（常にplaceholder表示）形にする。
+        }
+    };
+
     const handleSubmit = () => {
         if (!title.trim()) return;
         if (categories.some(c => !c.label.trim() || !c.value.trim())) return;
@@ -154,6 +185,30 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
 
             {/* カード */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-6 border border-white/50">
+
+                {/* サンプル選択 */}
+                <div className="mb-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100">
+                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700 mb-2">
+                        <BookOpen className="w-4 h-4 text-blue-500" />
+                        サンプルデータから選ぶ
+                    </label>
+                    <div className="relative">
+                        <select
+                            onChange={handleSampleSelect}
+                            defaultValue=""
+                            className="w-full appearance-none bg-white px-4 py-2.5 rounded-lg border border-slate-200 text-slate-600 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all text-sm cursor-pointer hover:border-blue-300"
+                        >
+                            <option value="" disabled>サンプルを選択してください...</option>
+                            {SAMPLES.map((sample) => (
+                                <option key={sample.id} value={sample.id}>
+                                    {sample.title} - {sample.description}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                    </div>
+                </div>
+
                 {/* 村サイズ選択 */}
                 <div className="mb-5">
                     <label className="block text-sm font-medium text-slate-700 mb-2">
