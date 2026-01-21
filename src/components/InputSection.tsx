@@ -44,6 +44,8 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
     const [categories, setCategories] = useState<CategoryData[]>([
         { id: '1', label: '', value: '', color: CATEGORY_COLORS[0] }
     ]);
+    // 詳細設定（AI・カスタム文章）アコーディオンの開閉状態
+    const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
     // 入力された名前リスト
     const [nameListText, setNameListText] = useState('');
     // カスタム詩機能
@@ -257,53 +259,80 @@ export default function InputSection({ onVisualize, isLoading }: InputSectionPro
                                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-24 resize-y"
                             />
 
-                            {/* AI文章生成モード */}
-                            <div className="pt-2 border-t border-slate-100">
-                                <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={useAI}
-                                        onChange={(e) => {
-                                            setUseAI(e.target.checked);
-                                            if (e.target.checked) {
-                                                setUseCustomText(false);
-                                            }
-                                        }}
-                                        className="w-4 h-4 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
-                                    />
-                                    <Bot className="w-4 h-4 text-[#4ECDC4]" />
-                                    Gemini AIで文章を生成する
-                                </label>
-                                <p className="text-xs text-slate-400 mt-1 ml-6">
-                                    ※オフの場合は定型文が表示されます
-                                </p>
-                            </div>
-
-                            {/* 隠し機能: オリジナル詩の入力 */}
-                            <div className="pt-2 border-t border-slate-100">
-                                <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
-                                    <input
-                                        type="checkbox"
-                                        checked={useCustomText}
-                                        onChange={(e) => setUseCustomText(e.target.checked)}
-                                        className="w-3.5 h-3.5 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
-                                    />
-                                    オリジナルの解説文を使用
-                                </label>
+                            {/* 詳細設定アコーディオン */}
+                            <div className="pt-2">
+                                <button
+                                    onClick={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+                                    className="flex items-center gap-2 text-sm text-slate-500 hover:text-[#4ECDC4] transition-colors w-full text-left mb-2"
+                                >
+                                    {isAdvancedSettingsOpen ? (
+                                        <ChevronDown className="w-4 h-4" />
+                                    ) : (
+                                        <ChevronRight className="w-4 h-4" />
+                                    )}
+                                    その他の設定（AI・文章カスタマイズ）
+                                </button>
                                 <AnimatePresence>
-                                    {useCustomText && (
+                                    {isAdvancedSettingsOpen && (
                                         <motion.div
                                             initial={{ height: 0, opacity: 0 }}
                                             animate={{ height: 'auto', opacity: 1 }}
                                             exit={{ height: 0, opacity: 0 }}
                                             className="overflow-hidden"
                                         >
-                                            <textarea
-                                                value={customText}
-                                                onChange={(e) => setCustomText(e.target.value)}
-                                                placeholder="あなた自身の言葉で解説文を書いてください..."
-                                                className="w-full mt-2 px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-32 resize-y"
-                                            />
+                                            <div className="space-y-4 pt-2 pb-2">
+                                                {/* AI文章生成モード */}
+                                                <div className="pt-2 border-t border-slate-100">
+                                                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer select-none">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={useAI}
+                                                            onChange={(e) => {
+                                                                setUseAI(e.target.checked);
+                                                                if (e.target.checked) {
+                                                                    setUseCustomText(false);
+                                                                }
+                                                            }}
+                                                            className="w-4 h-4 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
+                                                        />
+                                                        <Bot className="w-4 h-4 text-[#4ECDC4]" />
+                                                        Gemini AIで文章を生成する
+                                                    </label>
+                                                    <p className="text-xs text-slate-400 mt-1 ml-6">
+                                                        ※オフの場合は定型文が表示されます
+                                                    </p>
+                                                </div>
+
+                                                {/* 隠し機能: オリジナル詩の入力 */}
+                                                <div className="pt-2 border-t border-slate-100">
+                                                    <label className="flex items-center gap-2 text-xs text-slate-400 cursor-pointer select-none">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={useCustomText}
+                                                            onChange={(e) => setUseCustomText(e.target.checked)}
+                                                            className="w-3.5 h-3.5 rounded border-slate-300 text-[#4ECDC4] focus:ring-[#4ECDC4]/20"
+                                                        />
+                                                        オリジナルの解説文を使用
+                                                    </label>
+                                                    <AnimatePresence>
+                                                        {useCustomText && (
+                                                            <motion.div
+                                                                initial={{ height: 0, opacity: 0 }}
+                                                                animate={{ height: 'auto', opacity: 1 }}
+                                                                exit={{ height: 0, opacity: 0 }}
+                                                                className="overflow-hidden"
+                                                            >
+                                                                <textarea
+                                                                    value={customText}
+                                                                    onChange={(e) => setCustomText(e.target.value)}
+                                                                    placeholder="あなた自身の言葉で解説文を書いてください..."
+                                                                    className="w-full mt-2 px-4 py-3 rounded-xl border border-slate-200 focus:border-[#4ECDC4] focus:ring-2 focus:ring-[#4ECDC4]/20 outline-none transition-all bg-white/50 placeholder-slate-400 text-sm h-32 resize-y"
+                                                                />
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+                                                </div>
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>
